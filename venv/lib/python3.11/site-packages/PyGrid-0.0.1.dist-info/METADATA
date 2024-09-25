@@ -1,0 +1,18 @@
+Metadata-Version: 2.1
+Name: PyGrid
+Version: 0.0.1
+Summary: A Library for Private, Secure Deep Learning
+Home-page: https://github.com/OpenMined/PySyft
+Author: Bobby Wagner
+Author-email: contact@openmined.org
+License: Apache-2.0
+Keywords: deep learning artificial intelligence privacy secure multi-party computation federated learning differential privacy
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown
+
+#PySyft
+Temp Package
+
+
