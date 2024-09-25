@@ -74,10 +74,12 @@ Once the app is running, you can input a URL and fields/tags to scrape from the 
 
 To scrape a website using the UnScrape app, follow these steps:
 
-1. Input the URL of the website you want to scrape in the `URL` input field.
-2. Input the fields/tags to extract from the website in the `Fields/Tags` input field.
-3. Click on the `Scrape` button to start the scraping operation.
-4. Wait for the scraping operation to complete (this may take a few seconds or minutes, depending on the complexity of the website).
+1. Create a Groq Account if you don't have one, navigate to: https://console.groq.com/keys and create a new key.
+2. Input the Key created in the Groq API Key field.
+3. Input the URL of the website you want to scrape in the `URL` input field.
+4. Input the fields/tags to extract from the website in the `Fields/Tags` input field.
+5. Click on the `Scrape` button to start the scraping operation.
+6. Wait for the scraping operation to complete (this may take a few seconds or minutes, depending on the complexity of the website).
 
 ## Troubleshooting
 
