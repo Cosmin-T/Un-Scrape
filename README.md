@@ -64,7 +64,7 @@ To run the UnScrape app, follow these steps:
 
 1. Navigate to the cloned repository directory using `cd UnScrape`
 2. Activate the virtual environment using `source env/bin/activate` (on Linux/Mac) or `env\Scripts\activate` (on Windows)
-3. Run the app using `streamlit run UnScrape.py`
+3. Run the app using `streamlit run main.py`
 
 Once the app is running, you can input a URL and fields/tags to scrape from the website.
 
