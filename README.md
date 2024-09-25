@@ -51,8 +51,8 @@ UnScrape is a web data extraction tool that integrates AI technology with establ
 To install the UnScrape app, follow these steps:
 
 1. Clone the repository using `git clone https://github.com/Cosmin-T/Un-Scrape.git`
-2. Navigate to the cloned repository directory using `cd UnScrape`
-3. Create a new virtual environment using `python -m venv env`
+2. Navigate to the cloned repository directory using `cd Un-Scrape`
+3. Create a new virtual environment using `python3 -m venv env`
 4. Activate the virtual environment using `source env/bin/activate` (on Linux/Mac) or `env\Scripts\activate` (on Windows)
 5. Install the required packages using `pip install -r requirements.txt`
 
