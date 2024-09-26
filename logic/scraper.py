@@ -408,7 +408,9 @@ def process_chunk(client, sys_message, chunk):
         tuple: A tuple containing the prompt tokens, completion tokens, and parsed chunk.
     """
     # Set the model to use for the AI at a random choice from the list
-    llms = ['llama-3.1-70b-versatile', 'llama3-70b-8192']
+    llms = ['llama3-70b-8192','llama3-8b-8192',
+            'llama-3.1-70b-versatile','llama-3.1-8b-instant','llama3-groq-70b-8192-tool-use-preview',
+            'llama-3.2-90b-text-preview','llama-3.2-11b-text-preview']
     llm = random.choice(llms)
 
     # The retry count starts at 0, and we will retry up to 3 times if an error occurs.
