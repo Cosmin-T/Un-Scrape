@@ -174,48 +174,70 @@ def fetch_html_playwright(url):
 
 def clean_html(html_content):
     """
-    Removes all header and footer tags from the given HTML content.
+    Extracts only the most relevant content from the given HTML content.
+    Removes unnecessary elements and whitespace.
 
     Args:
         html_content (str): The HTML content to clean.
 
     Returns:
-        str: The cleaned HTML content.
+        str: The cleaned HTML content containing only relevant information.
     """
-    # Parse the HTML content using BeautifulSoup
     soup = BeautifulSoup(html_content, 'html.parser')
 
-    # Find all header and footer tags and remove them from the parsed HTML
-    for element in soup.find_all(['header', 'footer']):
+    # Remove script, style, nav, and other non-content elements
+    for element in soup(['script', 'style', 'nav', 'header', 'footer', 'aside']):
         element.decompose()
 
-    # Return the cleaned HTML content as a string
-    return str(soup)
+    # Find the main content area (you may need to adjust this based on the specific HTML structure)
+    main_content = soup.find('main') or soup.find('article') or soup.find('div', class_='content') or soup.body
+
+    if main_content:
+        # Remove all class and id attributes to reduce noise
+        for tag in main_content.find_all(True):
+            tag.attrs = {}
+
+        # Remove empty tags
+        for element in main_content(text=lambda text: not text.strip()):
+            element.extract()
+
+        # Convert to string and remove excessive whitespace
+        content = ' '.join(main_content.stripped_strings)
+        content = re.sub(r'\s+', ' ', content).strip()
+
+        return content
+    else:
+        print("No main content found in the HTML.")
+        return ""
 
 def html_to_markdown_with_readability(html_content):
     """
-    Converts the given HTML content to Markdown format, using the
-    `html2text` library. The HTML content is first cleaned of header and
-    footer tags.
+    Converts the given HTML content to a simplified Markdown format,
+    focusing on the most relevant content.
 
     Args:
         html_content (str): The HTML content to convert.
 
     Returns:
-        str: The Markdown content.
+        str: The simplified Markdown content.
     """
-    # Clean the input HTML by removing all header and footer tags
     cleaned_html = clean_html(html_content)
-    # Create an html2text converter object
+
+    # Create an html2text converter object with custom settings
     markdown_converter = html2text.HTML2Text()
-    # Do not ignore links in the conversion
-    markdown_converter.ignore_links = False
+    markdown_converter.ignore_links = True
+    markdown_converter.ignore_images = True
+    markdown_converter.ignore_emphasis = True
+    markdown_converter.body_width = 0  # No line wrapping
+
     # Convert the cleaned HTML to Markdown
     markdown_content = markdown_converter.handle(cleaned_html)
 
-    # Return the Markdown content
-    return markdown_content
+    # Further simplify the Markdown content
+    simplified_content = re.sub(r'\n+', '\n', markdown_content).strip()
+    simplified_content = re.sub(r'\[.*?\]', '', simplified_content)  # Remove link references
 
+    return simplified_content
 def save_raw_data(raw_data, timestamp, output_folder='output'):
     """
     Saves the given raw data to a file in the specified output folder.
@@ -408,9 +430,16 @@ def process_chunk(client, sys_message, chunk):
         tuple: A tuple containing the prompt tokens, completion tokens, and parsed chunk.
     """
     # Set the model to use for the AI at a random choice from the list
-    llms = ['llama3-70b-8192','llama3-8b-8192',
-            'llama-3.1-70b-versatile','llama-3.1-8b-instant','llama3-groq-70b-8192-tool-use-preview',
-            'llama-3.2-90b-text-preview','llama-3.2-11b-text-preview']
+    # llms = ['llama3-70b-8192','llama3-8b-8192',
+    #         'llama-3.1-70b-versatile','llama-3.1-8b-instant','llama3-groq-70b-8192-tool-use-preview',
+    #         'llama-3.2-90b-text-preview','llama-3.2-11b-text-preview']
+
+    llms = ['llama3-70b-8192',
+            'llama-3.1-70b-versatile',
+            'llama3-groq-70b-8192-tool-use-preview',
+            'llama-3.2-90b-text-preview',
+        ]
+
     llm = random.choice(llms)
 
     # The retry count starts at 0, and we will retry up to 3 times if an error occurs.
@@ -584,6 +613,8 @@ def format_data(data, DynamicListingsContainer, DynamicListingModel, selected_mo
             "output_tokens": total_output_tokens
         }
 
+        # Print total token usage
+        print(f"Total token usage - Input tokens: {total_input_tokens}, Output tokens: {total_output_tokens}")
         print(f"Combined response: {combined_response}")
         print(f"Token counts: {token_counts}")
 

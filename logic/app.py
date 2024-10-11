@@ -298,7 +298,10 @@ def perform_scrape(url_input, fields):
     DynamicListingsContainer = create_listings_container_model(DynamicListingModel)
     progress_bar.progress(0.75)
     # Parse the Markdown to a structured data format and get the number of input and output tokens used by the AI.
-    formatted_data, tokens_count = format_data(markdown, DynamicListingsContainer, DynamicListingModel, "Groq Llama3.1 70b")
+    formatted_data, token_counts = format_data(markdown, DynamicListingsContainer, DynamicListingModel, "Groq Llama3.1 70b")
+    print(f"Total token usage: {token_counts}")
+    print(f"Input tokens: {token_counts['input_tokens']}")
+    print(f"Output tokens: {token_counts['output_tokens']}")
     progress_bar.progress(0.875)
 
     # Save the structured data to a file.
