@@ -614,7 +614,7 @@ def format_data(data, DynamicListingsContainer, DynamicListingModel, selected_mo
         }
 
         # Print total token usage
-        print(f"Total token usage - Input tokens: {total_input_tokens}, Output tokens: {total_output_tokens}")
+        st.info(f"Total token usage: {total_input_tokens+total_output_tokens}")
         print(f"Combined response: {combined_response}")
         print(f"Token counts: {token_counts}")
 
