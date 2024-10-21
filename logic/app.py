@@ -100,7 +100,7 @@ def initialize_app():
 
         /* Set the background color of the main content area to a gradient. */
         .stApp {
-            background: linear-gradient(200deg, #002b36 20%, #1e1e1e 90%);
+            background: linear-gradient(200deg, #002b36 -50%, #1e1e1e 75%);
             border-radius: 10px;
             box-shadow: 3px 3px 20px rgba(0, 0, 0, 0.3);
             padding: 50px;
