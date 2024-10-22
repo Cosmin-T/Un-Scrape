@@ -12,22 +12,160 @@
             font-family: Arial, sans-serif;
             background-color: white;
             color: black;
+            min-height: 100vh;
+            position: relative;
+        }
+        .top-controls {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 16px;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+        }
+        .top-controls > * {
+            pointer-events: auto;
+        }
+        .buy-coffee-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background-color: black;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .buy-coffee-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .wide-mode-toggle {
+            display: flex;
+            align-items: center;
+            gap: 6px; /* Reduced from 8px */
+            font-size: 14px; /* Added to make text smaller */
         }
         .container {
             max-width: 800px;
             margin: 0 auto;
             padding: 60px 20px;
+            transition: all 0.3s ease;  /* Changed from max-width to all */
+        }
+        .container.wide {
+            max-width: 1200px;
         }
         .header {
             text-align: center;
-            margin-bottom: 48px;
-            opacity: 0;
-            animation: fadeIn 0.5s ease-out forwards;
+            margin: 48px 0;
+            padding-top: 32px;
         }
         .header h1 {
-            font-size: 32px;
+            font-size: 48px;
+            position: relative;
+            color: #000;
             letter-spacing: -0.5px;
         }
+        .header h1::before {
+            content: 'UnScraper';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            color: transparent;
+            background: linear-gradient(45deg, #000 40%, #666 50%, #000 60%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            background-size: 200% auto;
+            animation: shine 3s linear infinite;
+        }
+
+        @keyframes shine {
+            to {
+                background-position: 200% center;
+            }
+        }
+        .notice-box {
+            background-color: rgba(248, 249, 250, 0.3);
+            border: 1px solid rgba(233, 236, 239, 0.3);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 32px;
+            transition: all 0.3s ease;
+            opacity: 0.1;
+        }
+        .notice-box:hover {
+            opacity: 1;
+            background-color: rgba(248, 249, 250, 1);
+            border: 1px solid rgba(233, 236, 239, 1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .notice-box h3 {
+            color: #dc3545;
+            margin-bottom: 16px;
+            font-size: 18px;
+        }
+        .notice-box ul {
+            list-style-position: inside;
+            margin: 12px 0;
+        }
+        .notice-box li {
+            margin: 8px 0;
+            color: #666;
+        }
+        .notice-box strong {
+            color: #333;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 46px; /* Reduced from 60px */
+            height: 24px; /* Reduced from 34px */
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px; /* Reduced from 26px */
+            width: 18px; /* Reduced from 26px */
+            left: 3px; /* Adjusted from 4px */
+            bottom: 3px; /* Adjusted from 4px */
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: black;
+        }
+        input:checked + .slider:before {
+            transform: translateX(22px); /* Adjusted from 26px */
+        }
+
         .tab-container {
             margin: 20px 0;
             border: 1px solid #ddd;
@@ -62,7 +200,7 @@
             position: absolute;
             height: 100%;
             background: black;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;  /* Match the timing with container */
             z-index: 0;
         }
         .tab-content {
@@ -241,13 +379,31 @@
             font-size: 14px;
             animation: pulse 1.5s ease-in-out infinite;
         }
-
-        @keyframes pulse {
-            0% { opacity: 0.3; }
-            50% { opacity: 1; }
-            100% { opacity: 0.3; }
+        .footer {
+            position: fixed;
+            bottom: 16px;
+            right: 16px;
+            font-size: 14px;
+            color: #666;
+            z-index: 1000;
         }
 
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) rotate(-2deg);
+            }
+            50% {
+                transform: translateY(-10px) rotate(2deg);
+            }
+        }
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 0.3;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -274,9 +430,43 @@
     </style>
 </head>
 <body>
+    <div class="top-controls">
+        <a href="https://revolut.me/cosminhbs7" target="_blank" class="buy-coffee-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M2 21h18v-2H2v2zM20 8h-2V5h2v3zm0-5H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.89 2-2V5c0-1.11-.89-2-2-2zm-4 12c0 1.1-.9 2-2 2H8c-1.1 0-2-.9-2-2V3h10v12z"/>
+            </svg>
+            Buy me a coffee
+        </a>
+        <div class="wide-mode-toggle">
+            <span>Wide Mode</span>
+            <label class="switch">
+                <input type="checkbox" id="wideMode">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+
     <div class="container">
         <div class="header">
             <h1>UnScraper</h1>
+        </div>
+
+        <div class="notice-box">
+            <h3><strong>Please Note:</strong></h3>
+            <p>UnScrape is not designed to scrape websites that require user authentication or sessions.</p>
+            <strong>Examples of incompatible websites:</strong>
+            <ul>
+                <li>E-commerce sites like Amazon</li>
+                <li>Social media platforms</li>
+                <li>Online banking and payment gateways</li>
+                <li>Websites with restricted content access</li>
+            </ul>
+            <strong>Alternatives for scraping these websites:</strong>
+            <ul>
+                <li>Use automation frameworks like Selenium or Puppeteer</li>
+                <li>Utilize browser emulators</li>
+                <li>Leverage APIs or developer tools</li>
+            </ul>
         </div>
 
         <form method="post" action="{% url 'index' %}" id="scrapeForm" class="form-container">
@@ -364,6 +554,10 @@
         </form>
     </div>
 
+    <div class="footer">
+        © 2024 Developed by CosminT. All rights reserved
+    </div>
+
     <script>
         // Tab slider positioning
         function updateTabSlider() {
@@ -447,6 +641,11 @@
 
             const formData = new FormData(form);
 
+            // Store ALL preferences before submit
+            localStorage.setItem('lastUrl', document.getElementById('url').value);
+            localStorage.setItem('lastFields', document.getElementById('fields').value);
+            localStorage.setItem('wideMode', document.getElementById('wideMode').checked);
+
             // Show loading state
             submitBtn.textContent = 'Scraping...';
             loadingOverlay.style.display = 'flex';
@@ -457,10 +656,6 @@
                 input.classList.add('disabled');
             });
 
-            // Store form data
-            localStorage.setItem('lastUrl', document.getElementById('url').value);
-            localStorage.setItem('lastFields', document.getElementById('fields').value);
-
             // Submit form
             fetch(form.action, {
                 method: 'POST',
@@ -470,6 +665,12 @@
             .then(html => {
                 document.documentElement.innerHTML = html;
                 const scripts = document.getElementsByTagName('script');
+                // After loading new HTML, immediately restore wide mode
+                const isWideMode = localStorage.getItem('wideMode') === 'true';
+                document.querySelector('.container')?.classList.toggle('wide', isWideMode);
+                document.getElementById('wideMode').checked = isWideMode;
+
+                // Then run other scripts
                 for(let script of scripts) {
                     eval(script.innerHTML);
                 }
@@ -485,18 +686,37 @@
             });
         });
 
+        // Wide Mode Toggle functionality
+        const wideModeToggle = document.getElementById('wideMode');
+        const container = document.querySelector('.container');
+
+        wideModeToggle.addEventListener('change', function() {
+            container.classList.toggle('wide', this.checked);
+            localStorage.setItem('wideMode', this.checked);
+
+            // Reduced delay and added requestAnimationFrame for smoother transition
+            requestAnimationFrame(() => {
+                setTimeout(updateTabSlider, 150); // Reduced from 300ms to 150ms
+            });
+        });
+
         // Prevent form resubmission
         if (window.history.replaceState) {
             window.history.replaceState(null, null, window.location.href);
         }
 
-        // Restore form data
+        // Restore form data and preferences
         window.addEventListener('load', function() {
             const lastUrl = localStorage.getItem('lastUrl');
             const lastFields = localStorage.getItem('lastFields');
+            const isWideMode = localStorage.getItem('wideMode') === 'true';
 
             if (lastUrl) document.getElementById('url').value = lastUrl;
             if (lastFields) document.getElementById('fields').value = lastFields;
+
+            // Restore wide mode preference
+            wideModeToggle.checked = isWideMode;
+            container.classList.toggle('wide', isWideMode);
 
             // Reset loading state
             submitBtn.textContent = 'Scrape';
