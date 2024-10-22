@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>UnScraper</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: white;
+            color: black;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 48px;
+            opacity: 0;
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        .header h1 {
+            font-size: 32px;
+            letter-spacing: -0.5px;
+        }
+        .tab-container {
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .tabs {
+            display: flex;
+            background: #f5f5f5;
+            position: relative;
+            min-height: 30px;
+        }
+        .tab {
+            padding: 16px 32px;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            flex: 1;
+            position: relative;
+            transition: all 0.3s ease;
+            z-index: 1;
+            font-size: 16px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        .tab.active {
+            color: white;
+            font-weight: 600;
+        }
+        .tab-slider {
+            position: absolute;
+            height: 100%;
+            background: black;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 0;
+        }
+        .tab-content {
+            display: none;
+            padding: 32px;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        .tab-content.active {
+            display: block;
+            animation: slideIn 0.3s ease-out forwards;
+        }
+        .input-group {
+            margin-bottom: 32px;
+            position: relative;
+        }
+        .input-group:last-of-type {
+            margin-bottom: 40px;
+        }
+        .input-label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 600;
+            font-size: 15px;
+            color: #333;
+        }
+        .input-field {
+            width: 100%;
+            padding: 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            background-color: #fafafa;
+        }
+        .input-field:focus {
+            border-color: black;
+            box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
+            outline: none;
+            background-color: white;
+        }
+        .input-field.disabled {
+            background-color: #f5f5f5;
+            cursor: not-allowed;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background-color: black;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            position: relative;
+            letter-spacing: 0.3px;
+        }
+        .submit-btn:hover {
+            background-color: #333;
+            transform: translateY(-1px);
+        }
+        .submit-btn:active {
+            transform: translateY(1px);
+        }
+        .error {
+            padding: 16px;
+            margin-bottom: 24px;
+            color: #d32f2f;
+            background-color: #fff3f3;
+            border: 1px solid #ffcdd2;
+            border-radius: 8px;
+            animation: shake 0.5s ease-in-out;
+        }
+        .table-container {
+            overflow-x: auto;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            margin-top: 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            min-width: 600px;
+        }
+        th {
+            background-color: black;
+            color: white;
+            padding: 16px;
+            text-align: left;
+            font-weight: 500;
+            position: sticky;
+            top: 0;
+        }
+        th:first-child {
+            border-top-left-radius: 12px;
+        }
+        th:last-child {
+            border-top-right-radius: 12px;
+        }
+        td {
+            padding: 16px;
+            border-bottom: 1px solid #ddd;
+            transition: background-color 0.2s;
+        }
+        tr {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        tr:hover {
+            background-color: #f9f9f9;
+            transform: translateX(4px);
+        }
+        .results-info {
+            margin-bottom: 24px;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .download-icons {
+            display: flex;
+            gap: 16px;
+        }
+        .download-icon {
+            cursor: pointer;
+            padding: 12px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            background: none;
+            border: none;
+        }
+        .download-icon:hover {
+            background-color: #f0f0f0;
+            transform: translateY(-2px);
+        }
+        .download-icon svg {
+            width: 24px;
+            height: 24px;
+        }
+        .form-container {
+            position: relative;
+        }
+        .loading-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            backdrop-filter: blur(2px);
+            background: transparent;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            border-radius: 12px;
+        }
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid black;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+        .loading-text {
+            color: black;
+            font-size: 14px;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>UnScraper</h1>
+        </div>
+
+        <form method="post" action="{% url 'index' %}" id="scrapeForm" class="form-container">
+            <div class="loading-overlay">
+                <div class="loading-container">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">Scraping data...</div>
+                </div>
+            </div>
+
+            {% csrf_token %}
+            <input type="hidden" name="groq_api_key" value="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">
+
+            <div class="tab-container">
+                <div class="tabs">
+                    <button type="button" class="tab {% if not show_results %}active{% endif %}" data-tab="input">Input</button>
+                    <button type="button" class="tab {% if show_results %}active{% endif %}" data-tab="result">Result</button>
+                    <div class="tab-slider"></div>
+                </div>
+
+                <div id="input-tab" class="tab-content {% if not show_results %}active{% endif %}">
+                    <div class="input-group">
+                        <label class="input-label" for="url">URL to Scrape</label>
+                        <input type="url" class="input-field" name="url" id="url"
+                               placeholder="e.g., https://www.example.com" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label" for="fields">Fields (separated by commas)</label>
+                        <input type="text" class="input-field" name="fields" id="fields"
+                               placeholder="e.g., title, price, description" required>
+                    </div>
+
+                    <button type="submit" class="submit-btn" id="submitBtn">Scrape</button>
+                </div>
+
+                <div id="result-tab" class="tab-content {% if show_results %}active{% endif %}">
+                    {% if rows %}
+                        <div class="results-info">
+                            <span>Found {{ rows|length }} items</span>
+                            <div class="download-icons">
+                                <button class="download-icon" id="downloadCsv" title="Download CSV">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                </button>
+                                <button class="download-icon" id="downloadJson" title="Download JSON">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        {% for key in rows.0.keys %}
+                                            <th>{{ key|title }}</th>
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for row in rows %}
+                                        <tr>
+                                            {% for value in row.values %}
+                                                <td>{{ value }}</td>
+                                            {% endfor %}
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div id="results-placeholder">
+                            {% if error %}
+                                <div class="error">{{ error }}</div>
+                            {% else %}
+                                No items found, please input your query.
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Tab slider positioning
+        function updateTabSlider() {
+            const activeTab = document.querySelector('.tab.active');
+            const slider = document.querySelector('.tab-slider');
+            if (activeTab && slider) {
+                slider.style.width = `${activeTab.offsetWidth}px`;
+                slider.style.left = `${activeTab.offsetLeft}px`;
+            }
+        }
+
+        // Initialize tab slider
+        updateTabSlider();
+        window.addEventListener('resize', updateTabSlider);
+
+        // Tab switching with animation
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabName = this.dataset.tab;
+
+                // Update tabs
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                updateTabSlider();
+
+                // Update content with animation
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                const targetContent = document.getElementById(`${tabName}-tab`);
+                targetContent.classList.add('active');
+            });
+        });
+
+        // Download functions
+        function downloadCsv() {
+            const rows = Array.from(document.querySelectorAll('table tr'));
+            const csvContent = rows.map(row => {
+                return Array.from(row.cells)
+                    .map(cell => `"${cell.textContent.replace(/"/g, '""')}"`)
+                    .join(',');
+            }).join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'scraping_results.csv';
+            link.click();
+        }
+
+        function downloadJson() {
+            const rows = Array.from(document.querySelectorAll('table tr'));
+            const headers = Array.from(rows[0].cells).map(cell => cell.textContent);
+            const jsonData = rows.slice(1).map(row => {
+                const obj = {};
+                Array.from(row.cells).forEach((cell, index) => {
+                    obj[headers[index]] = cell.textContent;
+                });
+                return obj;
+            });
+
+            const blob = new Blob([JSON.stringify(jsonData, null, 2)], { type: 'application/json' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'scraping_results.json';
+            link.click();
+        }
+
+        // Add download event listeners
+        document.getElementById('downloadCsv')?.addEventListener('click', downloadCsv);
+        document.getElementById('downloadJson')?.addEventListener('click', downloadJson);
+
+        // Form submission handling
+        const form = document.getElementById('scrapeForm');
+        const loadingOverlay = document.querySelector('.loading-overlay');
+        const submitBtn = document.getElementById('submitBtn');
+        const inputs = document.querySelectorAll('.input-field');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(form);
+
+            // Show loading state
+            submitBtn.textContent = 'Scraping...';
+            loadingOverlay.style.display = 'flex';
+
+            // Disable inputs
+            inputs.forEach(input => {
+                input.disabled = true;
+                input.classList.add('disabled');
+            });
+
+            // Store form data
+            localStorage.setItem('lastUrl', document.getElementById('url').value);
+            localStorage.setItem('lastFields', document.getElementById('fields').value);
+
+            // Submit form
+            fetch(form.action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(html => {
+                document.documentElement.innerHTML = html;
+                const scripts = document.getElementsByTagName('script');
+                for(let script of scripts) {
+                    eval(script.innerHTML);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                submitBtn.textContent = 'Scrape';
+                loadingOverlay.style.display = 'none';
+                inputs.forEach(input => {
+                    input.disabled = false;
+                    input.classList.remove('disabled');
+                });
+            });
+        });
+
+        // Prevent form resubmission
+        if (window.history.replaceState) {
+            window.history.replaceState(null, null, window.location.href);
+        }
+
+        // Restore form data
+        window.addEventListener('load', function() {
+            const lastUrl = localStorage.getItem('lastUrl');
+            const lastFields = localStorage.getItem('lastFields');
+
+            if (lastUrl) document.getElementById('url').value = lastUrl;
+            if (lastFields) document.getElementById('fields').value = lastFields;
+
+            // Reset loading state
+            submitBtn.textContent = 'Scrape';
+            loadingOverlay.style.display = 'none';
+
+            // Enable inputs
+            inputs.forEach(input => {
+                input.disabled = false;
+                input.classList.remove('disabled');
+            });
+        });
+    </script>
+</body>
+</html>
