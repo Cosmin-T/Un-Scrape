@@ -25,7 +25,8 @@ SECRET_KEY = 'django-insecure-atx5lm!o_vd5q$-2&m2unq3&zvb#k!i+m+00=*xik$!xfq$a+1
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['dunscraper.serveo.net']
+CSRF_TRUSTED_ORIGINS = ['https://dunscraper.serveo.net']
 
 
 # Application definition

@@ -3,6 +3,35 @@
 <head>
     <title>UnScraper</title>
     <style>
+         /* Web Background Styles */
+        .web-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+            background-color: #f0f0f0; /* Light background for contrast */
+        }
+
+        .web-line {
+            position: absolute;
+            background: black; /* Ensure lines are visible */
+            z-index: 500; /* Bring lines above background */
+            width: 1px; /* Make the lines thicker */
+            height: 30px; /* Increase height to make them more prominent */
+            opacity: 0.2; /* Slight transparency */
+        }
+        @keyframes float {
+        0%, 100% {
+            transform: translateY(0px);
+        }
+        50% {
+            transform: translateY(10px);
+        }
+        }
         * {
             margin: 0;
             padding: 0;
@@ -430,6 +459,7 @@
     </style>
 </head>
 <body>
+    <div class="web-background"></div>
     <div class="top-controls">
         <a href="https://revolut.me/cosminhbs7" target="_blank" class="buy-coffee-btn">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -559,6 +589,69 @@
     </div>
 
     <script>
+        // Web Background Creation
+        function createWebBackground() {
+            const container = document.querySelector('.web-background');
+
+            if (!container) {
+                console.error('Container not found!');
+                return;
+            }
+
+            const webLines = 250;
+
+            for (let i = 0; i < webLines; i++) {
+                const line = document.createElement('div');
+                line.className = 'web-line';
+                line.style.position = 'absolute';
+
+                // Random radius and angle for circular motion
+                const radius = Math.random() * 300 + 50;
+                const angle = Math.random() * 360;
+                const centerX = Math.random() * window.innerWidth;
+                const centerY = Math.random() * window.innerHeight;
+
+                // Calculate initial position
+                const pointOnCircleX = centerX + radius * Math.cos(angle * Math.PI / 180);
+                const pointOnCircleY = centerY + radius * Math.sin(angle * Math.PI / 180);
+
+                // Set initial position and style for the line
+                line.style.top = `${pointOnCircleY}px`;
+                line.style.left = `${pointOnCircleX}px`;
+                line.style.width = `2px`;  // Thinner line
+                line.style.height = `${Math.random() * 80 + 10}px`;  // Shorter line height
+                line.style.transform = `rotate(${angle}deg)`;
+                line.style.background = 'black';
+                line.style.opacity = '0.15';  // Less opacity for subtle effect
+                line.style.zIndex = '1000';
+
+                container.appendChild(line);
+
+                // Animate the line in a circular motion
+                const direction = Math.random() < 0.5 ? -1 : 1; // Random clockwise or counter-clockwise
+                moveLine(line, centerX, centerY, radius, angle, direction);
+            }
+
+            // Move line function for animating circular motion
+            function moveLine(line, centerX, centerY, radius, angle, direction) {
+                const pointOnCircleX = centerX + radius * Math.cos(angle * Math.PI / 180);
+                const pointOnCircleY = centerY + radius * Math.sin(angle * Math.PI / 180);
+
+                // Update line position
+                line.style.top = `${pointOnCircleY}px`;
+                line.style.left = `${pointOnCircleX}px`;
+
+                // Continue animating with requestAnimationFrame
+                requestAnimationFrame(() => {
+                    moveLine(line, centerX, centerY, radius, angle + direction * 0.090, direction); // Slower speed
+                });
+            }
+        }
+
+        // Event listeners to run the background creation
+        document.addEventListener('DOMContentLoaded', createWebBackground);
+        window.addEventListener('load', createWebBackground);
+
         // Tab slider positioning
         function updateTabSlider() {
             const activeTab = document.querySelector('.tab.active');
@@ -664,16 +757,20 @@
             .then(response => response.text())
             .then(html => {
                 document.documentElement.innerHTML = html;
+
+                // Re-run scripts
                 const scripts = document.getElementsByTagName('script');
-                // After loading new HTML, immediately restore wide mode
+                for (let script of scripts) {
+                    eval(script.innerHTML);
+                }
+
+                // Reapply the background lines after loading new content
+                createWebBackground();  // <-- Recreate the background
+
+                // Restore preferences
                 const isWideMode = localStorage.getItem('wideMode') === 'true';
                 document.querySelector('.container')?.classList.toggle('wide', isWideMode);
                 document.getElementById('wideMode').checked = isWideMode;
-
-                // Then run other scripts
-                for(let script of scripts) {
-                    eval(script.innerHTML);
-                }
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -685,6 +782,7 @@
                 });
             });
         });
+
 
         // Wide Mode Toggle functionality
         const wideModeToggle = document.getElementById('wideMode');
