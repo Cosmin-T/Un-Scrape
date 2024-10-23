@@ -4,7 +4,7 @@
     <title>UnScraper</title>
     <style>
          /* Web Background Styles */
-        .web-background {
+         .web-background {
             position: fixed;
             top: 0;
             left: 0;
@@ -13,7 +13,64 @@
             z-index: -1;
             pointer-events: none;
             overflow: hidden;
-            background-color: #f0f0f0; /* Light background for contrast */
+            background:
+                radial-gradient(circle at 0% 0%, rgba(240,240,240,0.8) 0%, transparent 50%),
+                radial-gradient(circle at 100% 0%, rgba(230,230,230,0.8) 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(245,245,245,0.8) 0%, transparent 50%),
+                radial-gradient(circle at 0% 100%, rgba(235,235,235,0.8) 0%, transparent 50%),
+                linear-gradient(45deg, #ffffff 0%, #f8f8f8 100%);
+        }
+
+        .grid-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            animation: moveGrid 15s linear infinite;
+        }
+
+        .floating-dots {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .dot {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        @keyframes moveGrid {
+            0% {
+                transform: translateX(0) translateY(0);
+            }
+            100% {
+                transform: translateX(20px) translateY(20px);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0);
+            }
+            50% {
+                transform: translateY(-20px) translateX(10px);
+            }
+        }
+
+        /* Add this to your container class */
+        .container {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.7);
         }
 
         .web-line {
@@ -96,13 +153,18 @@
             text-align: center;
             margin: 48px 0;
             padding-top: 32px;
+            background-color: black;
+            border-radius: 12px;
+            padding: 32px;
         }
+
         .header h1 {
             font-size: 48px;
             position: relative;
-            color: #000;
+            color: white;
             letter-spacing: -0.5px;
         }
+
         .header h1::before {
             content: 'UnScraper';
             position: absolute;
@@ -111,7 +173,7 @@
             width: 100%;
             height: 100%;
             color: transparent;
-            background: linear-gradient(45deg, #000 40%, #666 50%, #000 60%);
+            background: linear-gradient(45deg, #fff 40%, #666 50%, #fff 60%);
             -webkit-background-clip: text;
             background-clip: text;
             background-size: 200% auto;
@@ -124,36 +186,42 @@
             }
         }
         .notice-box {
-            background-color: rgba(248, 249, 250, 0.3);
-            border: 1px solid rgba(233, 236, 239, 0.3);
+            background-color: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
             padding: 24px;
             margin-bottom: 32px;
             transition: all 0.3s ease;
-            opacity: 0.1;
+            opacity: 0.1;  /* Back to very low opacity by default */
+            color: white;
         }
+
         .notice-box:hover {
             opacity: 1;
-            background-color: rgba(248, 249, 250, 1);
-            border: 1px solid rgba(233, 236, 239, 1);
+            background-color: rgba(0, 0, 0, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
         }
+
         .notice-box h3 {
-            color: #dc3545;
+            color: #ff4d4d;
             margin-bottom: 16px;
             font-size: 18px;
         }
+
         .notice-box ul {
             list-style-position: inside;
             margin: 12px 0;
         }
+
         .notice-box li {
             margin: 8px 0;
-            color: #666;
+            color: #999;
         }
+
         .notice-box strong {
-            color: #333;
+            color: #fff;
         }
         .switch {
             position: relative;
@@ -195,19 +263,25 @@
             transform: translateX(22px); /* Adjusted from 26px */
         }
 
+        /* First ensure the tab container inherits the width properly */
         .tab-container {
             margin: 20px 0;
             border: 1px solid #ddd;
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            width: 100%; /* Make sure it takes full width of its parent */
+            transition: all 0.3s ease; /* Match the container transition */
         }
+
         .tabs {
             display: flex;
             background: #f5f5f5;
             position: relative;
             min-height: 30px;
+            width: 100%; /* Ensure tabs take full width */
         }
+
         .tab {
             padding: 16px 32px;
             cursor: pointer;
@@ -220,6 +294,8 @@
             font-size: 16px;
             font-weight: 500;
             letter-spacing: 0.5px;
+            text-align: center;
+            white-space: nowrap;
         }
         .tab.active {
             color: white;
@@ -229,7 +305,7 @@
             position: absolute;
             height: 100%;
             background: black;
-            transition: all 0.3s ease;  /* Match the timing with container */
+            transition: all 0.3s ease;
             z-index: 0;
         }
         .tab-content {
@@ -459,7 +535,10 @@
     </style>
 </head>
 <body>
-    <div class="web-background"></div>
+    <div class="web-background">
+        <div class="grid-overlay"></div>
+        <div class="floating-dots" id="floatingDots"></div>
+    </div>
     <div class="top-controls">
         <a href="https://revolut.me/cosminhbs7" target="_blank" class="buy-coffee-btn">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -486,10 +565,10 @@
             <p>UnScrape is not designed to scrape websites that require user authentication or sessions.</p>
             <strong>Examples of incompatible websites:</strong>
             <ul>
-                <li>E-commerce sites like Amazon</li>
-                <li>Social media platforms</li>
+                <li>Some E-commerce sites like Amazon</li>
+                <li>Some Social media platforms</li>
                 <li>Online banking and payment gateways</li>
-                <li>Websites with restricted content access</li>
+                <li>Websites with restricted content access or captcha verification</li>
             </ul>
             <strong>Alternatives for scraping these websites:</strong>
             <ul>
@@ -589,6 +668,19 @@
     </div>
 
     <script>
+        // Create floating dots
+        const dotsContainer = document.getElementById('floatingDots');
+        const numberOfDots = 100;
+
+        for (let i = 0; i < numberOfDots; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'dot';
+            dot.style.left = `${Math.random() * 100}%`;
+            dot.style.top = `${Math.random() * 100}%`;
+            dot.style.animationDelay = `${Math.random() * 8}s`;
+            dotsContainer.appendChild(dot);
+        }
+
         // Web Background Creation
         function createWebBackground() {
             const container = document.querySelector('.web-background');
@@ -598,57 +690,139 @@
                 return;
             }
 
-            const webLines = 250;
+            const config = {
+                numberOfLines: 250,
+                baseRadius: { min: 50, max: 350 },
+                segmentLength: { min: 15, max: 60 },
+                opacity: { min: 0.05, max: 0.2 },
+                rotationSpeed: { min: 0.03, max: 0.08 },
+                patterns: [
+                    // */-  pattern
+                    [
+                        { x: 0, y: 0, angle: 0 },
+                        { x: 1, y: 0, angle: 45 },
+                        { x: 1, y: 0, angle: -45 }
+                    ],
+                    // \_  pattern
+                    [
+                        { x: 0, y: 0, angle: -45 },
+                        { x: 1, y: 1, angle: 0 }
+                    ],
+                    // /*  pattern
+                    [
+                        { x: 0, y: 0, angle: 45 },
+                        { x: 1, y: -1, angle: -45 }
+                    ],
+                    // Z pattern
+                    [
+                        { x: 0, y: 0, angle: 0 },
+                        { x: 1, y: 1, angle: -45 },
+                        { x: 1, y: 1, angle: 0 }
+                    ],
+                    // L pattern
+                    [
+                        { x: 0, y: 0, angle: 90 },
+                        { x: 0, y: 1, angle: 0 }
+                    ],
+                    // C pattern
+                    [
+                        { x: 0, y: 0, angle: -45 },
+                        { x: 1, y: 0, angle: -90 },
+                        { x: 1, y: 1, angle: -135 }
+                    ]
+                ]
+            };
 
-            for (let i = 0; i < webLines; i++) {
-                const line = document.createElement('div');
-                line.className = 'web-line';
-                line.style.position = 'absolute';
+            class GeometricLine {
+                constructor() {
+                    this.segments = [];
+                    this.pattern = config.patterns[Math.floor(Math.random() * config.patterns.length)];
+                    this.baseLength = Math.random() * (config.segmentLength.max - config.segmentLength.min) + config.segmentLength.min;
+                    this.radius = Math.random() * (config.baseRadius.max - config.baseRadius.min) + config.baseRadius.min;
+                    this.angle = Math.random() * 360;
+                    this.centerX = Math.random() * window.innerWidth;
+                    this.centerY = Math.random() * window.innerHeight;
+                    this.rotationSpeed = (Math.random() * (config.rotationSpeed.max - config.rotationSpeed.min) + config.rotationSpeed.min) *
+                                        (Math.random() < 0.5 ? -1 : 1);
 
-                // Random radius and angle for circular motion
-                const radius = Math.random() * 300 + 50;
-                const angle = Math.random() * 360;
-                const centerX = Math.random() * window.innerWidth;
-                const centerY = Math.random() * window.innerHeight;
+                    this.createSegments();
+                }
 
-                // Calculate initial position
-                const pointOnCircleX = centerX + radius * Math.cos(angle * Math.PI / 180);
-                const pointOnCircleY = centerY + radius * Math.sin(angle * Math.PI / 180);
+                createSegments() {
+                    let currentX = 0;
+                    let currentY = 0;
 
-                // Set initial position and style for the line
-                line.style.top = `${pointOnCircleY}px`;
-                line.style.left = `${pointOnCircleX}px`;
-                line.style.width = `2px`;  // Thinner line
-                line.style.height = `${Math.random() * 80 + 10}px`;  // Shorter line height
-                line.style.transform = `rotate(${angle}deg)`;
-                line.style.background = 'black';
-                line.style.opacity = '0.15';  // Less opacity for subtle effect
-                line.style.zIndex = '1000';
+                    this.pattern.forEach((segment, index) => {
+                        const line = document.createElement('div');
+                        line.className = 'web-line';
 
-                container.appendChild(line);
+                        // Base styles
+                        line.style.position = 'absolute';
+                        line.style.width = `${this.baseLength}px`;
+                        line.style.height = '2px';
+                        line.style.background = 'black';
+                        line.style.opacity = Math.random() * (config.opacity.max - config.opacity.min) + config.opacity.min;
+                        line.style.transformOrigin = '0 50%';
+                        line.style.transition = 'opacity 0.3s ease';
 
-                // Animate the line in a circular motion
-                const direction = Math.random() < 0.5 ? -1 : 1; // Random clockwise or counter-clockwise
-                moveLine(line, centerX, centerY, radius, angle, direction);
+                        // Add hover effect
+                        line.addEventListener('mouseover', () => {
+                            line.style.opacity = '0.4';
+                        });
+                        line.addEventListener('mouseout', () => {
+                            line.style.opacity = Math.random() * (config.opacity.max - config.opacity.min) + config.opacity.min;
+                        });
+
+                        this.segments.push({
+                            element: line,
+                            offsetX: currentX,
+                            offsetY: currentY,
+                            baseAngle: segment.angle
+                        });
+
+                        container.appendChild(line);
+
+                        // Update position for next segment
+                        currentX += Math.cos(segment.angle * Math.PI / 180) * this.baseLength;
+                        currentY += Math.sin(segment.angle * Math.PI / 180) * this.baseLength;
+                    });
+                }
+
+                animate() {
+                    const baseX = this.centerX + this.radius * Math.cos(this.angle * Math.PI / 180);
+                    const baseY = this.centerY + this.radius * Math.sin(this.angle * Math.PI / 180);
+
+                    this.segments.forEach(segment => {
+                        const totalAngle = (this.angle + segment.baseAngle) * Math.PI / 180;
+                        const x = baseX + segment.offsetX;
+                        const y = baseY + segment.offsetY;
+
+                        segment.element.style.left = `${x}px`;
+                        segment.element.style.top = `${y}px`;
+                        segment.element.style.transform = `rotate(${this.angle + segment.baseAngle}deg)`;
+                    });
+
+                    this.angle += this.rotationSpeed;
+                    requestAnimationFrame(() => this.animate());
+                }
             }
 
-            // Move line function for animating circular motion
-            function moveLine(line, centerX, centerY, radius, angle, direction) {
-                const pointOnCircleX = centerX + radius * Math.cos(angle * Math.PI / 180);
-                const pointOnCircleY = centerY + radius * Math.sin(angle * Math.PI / 180);
-
-                // Update line position
-                line.style.top = `${pointOnCircleY}px`;
-                line.style.left = `${pointOnCircleX}px`;
-
-                // Continue animating with requestAnimationFrame
-                requestAnimationFrame(() => {
-                    moveLine(line, centerX, centerY, radius, angle + direction * 0.090, direction); // Slower speed
-                });
+            // Create and animate lines
+            const lines = [];
+            for (let i = 0; i < config.numberOfLines; i++) {
+                const line = new GeometricLine();
+                lines.push(line);
+                line.animate();
             }
+
+            // Cleanup and recreate on resize
+            window.addEventListener('resize', () => {
+                container.innerHTML = '';
+                createWebBackground();
+            });
         }
 
-        // Event listeners to run the background creation
+        // Initialize
         document.addEventListener('DOMContentLoaded', createWebBackground);
         window.addEventListener('load', createWebBackground);
 
@@ -656,17 +830,31 @@
         function updateTabSlider() {
             const activeTab = document.querySelector('.tab.active');
             const slider = document.querySelector('.tab-slider');
-            if (activeTab && slider) {
-                slider.style.width = `${activeTab.offsetWidth}px`;
-                slider.style.left = `${activeTab.offsetLeft}px`;
+            const tabsContainer = document.querySelector('.tabs');
+
+            if (activeTab && slider && tabsContainer) {
+                // Get the exact width and position of the active tab
+                const tabRect = activeTab.getBoundingClientRect();
+                const containerRect = tabsContainer.getBoundingClientRect();
+
+                // Set the slider width to match the active tab
+                slider.style.width = `${tabRect.width}px`;
+                // Calculate the left position relative to the container
+                slider.style.left = `${tabRect.left - containerRect.left}px`;
             }
         }
 
-        // Initialize tab slider
-        updateTabSlider();
-        window.addEventListener('resize', updateTabSlider);
+        // Add event listeners for wide mode toggle and window resize
+        document.getElementById('wideMode').addEventListener('change', function() {
+            // Add a small delay to let the container transition complete
+            setTimeout(updateTabSlider, 300);
+        });
 
-        // Tab switching with animation
+        window.addEventListener('resize', function() {
+            updateTabSlider();
+        });
+
+        // Call updateTabSlider when switching tabs
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', function() {
                 const tabName = this.dataset.tab;
@@ -674,15 +862,34 @@
                 // Update tabs
                 document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
                 this.classList.add('active');
-                updateTabSlider();
 
-                // Update content with animation
+                // Update content
                 document.querySelectorAll('.tab-content').forEach(content => {
                     content.classList.remove('active');
                 });
-                const targetContent = document.getElementById(`${tabName}-tab`);
-                targetContent.classList.add('active');
+                document.getElementById(`${tabName}-tab`).classList.add('active');
+
+                // Update slider after tab switch
+                updateTabSlider();
             });
+        });
+
+        // Initialize tab slider on page load
+        document.addEventListener('DOMContentLoaded', updateTabSlider);
+        window.addEventListener('load', updateTabSlider);
+
+        // Update after any AJAX content changes
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.addedNodes.length) {
+                    updateTabSlider();
+                }
+            });
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
         });
 
         // Download functions

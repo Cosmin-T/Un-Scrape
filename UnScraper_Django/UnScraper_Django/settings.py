@@ -1,3 +1,7 @@
+import os
+print(os.getcwd())
+import re
+
 """
 Django settings for UnScraper_Django project.
 
@@ -25,8 +29,34 @@ SECRET_KEY = 'django-insecure-atx5lm!o_vd5q$-2&m2unq3&zvb#k!i+m+00=*xik$!xfq$a+1
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['dunscraper.serveo.net']
-CSRF_TRUSTED_ORIGINS = ['https://dunscraper.serveo.net']
+
+# Then update these settings:
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '.loca.lt',  # This will match any subdomain of loca.lt
+    'dunscraper.loca.lt',
+    'dunscraper.serveo.net',
+]
+
+# Add this setting to allow any subdomain
+ALLOW_HOSTS_PATTERN = [
+    r'.*\.loca\.lt$',
+]
+
+# Update CSRF settings
+CSRF_TRUSTED_ORIGINS = [
+    'http://dunscraper.loca.lt',
+    'https://dunscraper.loca.lt',
+    'http://localhost:8005',
+    'http://127.0.0.1:8005',
+    'https://dunscraper.serveo.net',
+]
+
+# Add these additional security settings
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
+USE_X_FORWARDED_PORT = True
 
 
 # Application definition
@@ -83,7 +113,7 @@ TEMPLATES = [
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': BASE_DIR / 'ddb.sqlite3',
     }
 }
 

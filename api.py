@@ -146,7 +146,12 @@ def process_chunk(client, sys_message, chunk, fields):
     :return: A list of dictionaries with the extracted fields
     """
     # Choose a random model from the available models
-    llms = ['llama3-70b-8192', 'llama-3.1-70b-versatile']
+    llms = ['llama3-70b-8192',
+            'llama-3.1-70b-versatile',
+            'llama3-groq-70b-8192-tool-use-preview',
+            'llama-3.2-90b-text-preview',
+            'llama-3.2-90b-vision-preview'
+        ]
     llm = random.choice(llms)
 
     # Initialize the retry count and delay

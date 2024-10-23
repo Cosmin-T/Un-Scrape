@@ -514,6 +514,7 @@ def process_chunk(client, sys_message, chunk):
             'llama-3.1-70b-versatile',
             'llama3-groq-70b-8192-tool-use-preview',
             'llama-3.2-90b-text-preview',
+            'llama-3.2-90b-vision-preview'
         ]
 
     llm = random.choice(llms)
