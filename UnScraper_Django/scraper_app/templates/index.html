@@ -1399,7 +1399,7 @@
             const isCustomApi = document.querySelector('.api-tab[data-api="custom"]').classList.contains('active');
             if (!isCustomApi) {
                 const usageCount = parseInt(localStorage.getItem('apiUsageCount') || '0');
-                if (usageCount >= 50) { // This number sets up the limit to the default API usage
+                if (usageCount >= 5) { // This number sets up the limit to the default API usage
                     document.getElementById('trialEndedPopup').style.display = 'flex';
                     return false;
                 }
