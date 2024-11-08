@@ -18,8 +18,17 @@ from typing import List
 import logging
 from django.http import HttpResponse
 import csv
+from dotenv import load_dotenv, dotenv_values
+import os
 
-GROQ_API_KEY = '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'
+dotenv_path = os.path.join(os.path.dirname(__file__), '..', '.env')
+# print(f'Dotenv path is: {dotenv_path}')
+load_dotenv(dotenv_path)
+
+env_variables = dotenv_values(dotenv_path)
+
+GROQ_API_KEY = env_variables.get('GROQ_API_KEY')
+# print(f'Groq Key is: {GROQ_API_KEY}')
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
