@@ -1,5 +1,12 @@
+# UnScraper - Choose Your Frontend!
 
-# UnScrape App README
+##### Django
+
+![1730117309282](image/README/1730117309282.png)
+
+![1730117332909](image/README/1730117332909.png)
+
+##### Streamlit
 
 ![1727278263048](image/README/1727278263048.png)
 
@@ -7,13 +14,13 @@
 
 ## Table of Contents
 
----
-
 * [Introduction](#introduction)
 * [System Requirements](#system-requirements)
 * [Features](#features)
+* [Project Structure](#project-structure)
+* [Choose Your Frontend](#choose-your-frontend)
 * [Installation](#installation)
-* [Usage](#usage)
+* [Running the Applications](#running-the-applications)
 * [How to Scrape Websites](#how-to-scrape-websites)
 * [Troubleshooting](#troubleshooting)
 * [Known Issues](#known-issues)
@@ -22,85 +29,156 @@
 
 ## Introduction
 
----
+UnScraper is a web scraping tool that comes with TWO completely separate frontend implementations:
 
-UnScrape is a web data extraction tool that integrates AI technology with established scraping methods. It retrieves information from websites without needing user credentials or active sessions, employing HTML parsing and CSS selectors. UnScrape's distinguishing feature is its AI-driven ability to convert scraped content into organized tables, streamlining data analysis and manipulation for users.
+1. A Streamlit version - Perfect for data scientists and those who prefer Streamlit's interactive interface
+2. A Django version - Ideal for those who prefer a traditional web application interface
+
+Both versions offer the same core scraping functionality - you choose the interface that works best for you!
 
 ## System Requirements
 
----
+For Streamlit Version:
 
 * Python 3.8 or higher
 * Streamlit 0.86.0 or higher
 * Playwright 1.12.0 or higher
 
+For Django Version:
+
+* Python 3.11 or higher
+* Django 4.0 or higher
+* Playwright 1.12.0 or higher
+
 ## Features
 
----
+Common Features (Both Versions):
 
-* Extract data from websites without requiring user authentication or sessions
-* Supports multiple CSS selectors for extracting data
-* Features a loading animation for long-running scraping operations
-* Includes a custom CSS style sheet for a dark mode interface
-* Allows users to input a URL and fields/tags to scrape from the website
+* AI-powered web scraping
+* Extract data without user authentication
+* Support for CSS selectors
+* Loading animations
+* Groq API integration
+
+Streamlit-Specific Features:
+
+* Interactive data visualization
+* Real-time updates
+* Data science-friendly interface
+
+Django-Specific Features:
+
+* Traditional web interface
+* Database storage
+* Template-based rendering
+
+## Choose Your Frontend
+
+### Option 1: Streamlit Version
+
+- Best for: Data scientists, analysts, and those who love interactive data apps
+- Features: Real-time updates, interactive widgets, data visualization
+- Startup: Single command to run
+
+### Option 2: Django Version
+
+- Best for: Web developers and those who prefer traditional web interfaces
+- Features: Database storage, template-based views, web-app structure
+- Startup: Standard Django development server
 
 ## Installation
 
----
+1. Clone the repository:
 
-To install the UnScrape app, follow these steps:
+   ```bash
+   git clone https://github.com/YourUsername/UnScraper.git
+   ```
+2. Choose your preferred version:
 
-1. Clone the repository using `git clone https://github.com/Cosmin-T/Un-Scrape.git`
-2. Navigate to the cloned repository directory using `cd Un-Scrape`
-3. Create a new virtual environment using `python3 -m venv env`
-4. Activate the virtual environment using `source env/bin/activate` (on Linux/Mac) or `env\Scripts\activate` (on Windows)
-5. Install the required packages using `pip install -r requirements.txt`
+   For Streamlit:
 
-## Usage
+   ```bash
+   cd UnScraper
+   python -m venv venv
+   source venv/bin/activate  # or venv\Scripts\activate on Windows
+   pip install -r requirements.txt
+   ```
 
----
+   For Django:
 
-To run the UnScrape app, follow these steps:
+   ```bash
+   cd UnScraper
+   python -m venv venv
+   source venv/bin/activate  # or venv\Scripts\activate on Windows
+   pip install -r requirements.txt
+   python manage.py migrate
+   ```
 
-1. Navigate to the cloned repository directory using `cd UnScrape`
-2. Activate the virtual environment using `source env/bin/activate` (on Linux/Mac) or `env\Scripts\activate` (on Windows)
-3. Run the app using `streamlit run main.py`
+## Running the Applications
 
-Once the app is running, you can input a URL and fields/tags to scrape from the website.
+### To Run Streamlit Version:
+
+```bash
+cd UnScraper
+streamlit run main.py
+```
+
+Access at: `http://localhost:8501`
+
+### To Run Django Version:
+
+```bash
+cd UnScraper
+python3 api.py
+cd UnScraper_Django
+python manage.py runserver
+```
+
+Access at: `http://127.0.0.1:8000`
 
 ## How to Scrape Websites
 
----
+1. Create a Groq Account:
 
-To scrape a website using the UnScrape app, follow these steps:
+   * Navigate to: https://console.groq.com/keys
+   * Register
+   * Create a new API key
+2. Choose your preferred interface:
 
-1. Create a Groq Account if you don't have one, navigate to: https://console.groq.com/keys and create a new key.
-2. Input the Key created in the Groq API Key field.
-3. Input the URL of the website you want to scrape in the `URL` input field.
-4. Input the fields/tags to extract from the website in the `Fields/Tags` input field.
-5. Click on the `Scrape` button to start the scraping operation.
-6. Wait for the scraping operation to complete (this may take a few seconds or minutes, depending on the complexity of the website).
+   Using Streamlit:
+
+   * Open the Streamlit app
+   * Enter your Groq API key
+   * Input URL and fields
+   * Watch real-time results
+
+   Using Django:
+
+   * Open the Django web interface
+   * Enter your Groq API key
+   * Input URL and fields
+   * View results on the results page
 
 ## Troubleshooting
 
----
+Streamlit Version:
 
-If you encounter any issues while running the UnScrape app, try the following:
+* Check Streamlit console output
+* Verify Streamlit installation
+* Check for port 8501 conflicts
 
-* Check the console logs for any error messages
-* Make sure the website you are trying to scrape is not blocking the app's requests
-* Check the app's configuration files for any typos or misconfigurations
+Django Version:
+
+* Check Django debug output
+* Verify database migrations
+* Check for port 8000 conflicts
 
 ## Known Issues
 
----
-
-* The app may not work correctly with websites that use heavy JavaScript or dynamic content
-* The app may not work correctly with websites that block requests from unknown IP addresses
-* The app may not work correctly with websites that use advanced anti-scraping measures
+* Some websites block automated scraping
+* Advanced anti-scraping measures may prevent extraction
+* Each version runs on different default ports
 
 ## License
 
----
-
-The UnScrape app is licensed under the MIT License. See the [LICENSE](LICENSE) file for more information.
+Both versions of UnScraper are licensed under the MIT License. See the [LICENSE](LICENSE) file for more information.

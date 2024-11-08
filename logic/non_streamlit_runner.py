@@ -1,4 +1,4 @@
-# scraper.py
+# non_streamlit_runner.py
 
 import os
 import random
@@ -775,6 +775,12 @@ def save_formatted_data(formatted_data, timestamp, output_folder='output'):
         # Return None if there was an exception
         return None
 
+def remove_urls(content):
+    # Remove URLs using regex
+    url_pattern = r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
+    cleaned_content = re.sub(url_pattern, '', content)
+    return cleaned_content
+
 def main():
     args = parse_args()
 
@@ -794,23 +800,20 @@ def main():
     # Convert the HTML content to Markdown
     markdown_content = html_to_markdown_with_readability(html_content)
 
-    # Save the raw data to a Markdown file
-    timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
-    raw_data_path = save_raw_data(markdown_content, timestamp)
+    # Remove URLs from the content directly
+    cleaned_content = remove_urls(markdown_content)  # You'll need to modify remove_urls_from_file to remove_urls
 
-    # Remove URLs from the raw data
-    cleaned_content = remove_urls_from_file(raw_data_path)
-
-    # Format the cleaned data according to the Groq Llama3.1 70b model's requirements
     # Create a Groq client using the API key
     client = groq_connection(groq_api_key)
 
     # Generate the system message to be sent to the AI
     system_message = generate_system_message(DynamicListingModel)
 
-    # Process the cleaned content and save the formatted data
+    # Process the cleaned content and get the formatted data
     combined_response, token_counts = format_data(cleaned_content, DynamicListingsContainer, DynamicListingModel, 'Groq Llama3.1 70b')
-    save_formatted_data(combined_response, timestamp)
+
+    # Print the JSON response (this will be captured by the API)
+    print(json.dumps(combined_response))
 
 if __name__ == "__main__":
     main()
