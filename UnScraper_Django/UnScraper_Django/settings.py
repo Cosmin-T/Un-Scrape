@@ -31,13 +31,14 @@ DEBUG = True
 
 
 # Then update these settings:
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    '.loca.lt',  # This will match any subdomain of loca.lt
-    'dunscraper.loca.lt',
-    'dunscraper.serveo.net',
-]
+# ALLOWED_HOSTS = [
+#     'localhost',
+#     '127.0.0.1',
+#     '.loca.lt',  # This will match any subdomain of loca.lt
+#     'dunscraper.loca.lt',
+#     'dunscraper.serveo.net',
+# ]
+ALLOWED_HOSTS = ['*']
 
 # Add this setting to allow any subdomain
 ALLOW_HOSTS_PATTERN = [

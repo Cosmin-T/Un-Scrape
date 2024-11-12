@@ -234,8 +234,26 @@
             padding: 60px 20px;
             transition: all 0.3s ease;
         }
+        /* Set width of the page to 100% for wide mode */
         .container.wide {
-            max-width: 1200px;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            padding: 0 5%;
+        }
+
+        /* For medium and larger screens */
+        @media (min-width: 1400px) {
+            .container.wide {
+                padding: 0 10%;
+            }
+        }
+
+        /* For large screens */
+        @media (min-width: 1800px) {
+            .container.wide {
+                padding: 0 15%;
+            }
         }
         .header {
             text-align: center;
@@ -276,20 +294,17 @@
         }
         .notice-box {
             font-family: 'IBM Plex Sans', sans-serif;
-            background-color: rgba(0, 0, 0, 0);  /* Start fully transparent */
-            border: 1px solid rgba(255, 255, 255, 0);  /* Start with invisible border */
+            background-color: rgba(0, 0, 0, 0);
+            border: 1px solid rgba(255, 255, 255, 0);
             border-radius: 12px;
             padding: 24px;
             margin-bottom: 32px;
             transition: all 0.3s ease;
-            color: transparent;  /* Make text transparent */
+            color: transparent;
             position: relative;
-            z-index: 10;  /* Ensure it's above the background */
-        }
-
-        .notice-box * {
-            opacity: 0;  /* Make all child elements invisible */
-            transition: opacity 0.3s ease;
+            z-index: 10;
+            height: 200px; /* Half height when not hovered */
+            overflow: hidden;
         }
 
         .notice-box:hover {
@@ -297,22 +312,29 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
-            color: white;  /* Show text on hover */
+            color: white;
+            height: 660px; /* Increased height to show all content */
+        }
+
+        /* Keep all other styles exactly the same */
+        .notice-box * {
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
         .notice-box:hover * {
-            opacity: 1;  /* Show all child elements on hover */
+            opacity: 1;
         }
 
         .notice-box h3 {
-            color: transparent;  /* Start with transparent text */
+            color: transparent;
             margin-bottom: 16px;
             font-size: 18px;
             transition: color 0.3s ease;
         }
 
         .notice-box:hover h3 {
-            color: #ff4d4d;  /* Show color on hover */
+            color: #ff4d4d;
         }
 
         .notice-box ul {
@@ -322,21 +344,21 @@
 
         .notice-box li {
             margin: 8px 0;
-            color: transparent;  /* Start with transparent text */
+            color: transparent;
             transition: color 0.3s ease;
         }
 
         .notice-box:hover li {
-            color: #999;  /* Show color on hover */
+            color: #999;
         }
 
         .notice-box strong {
-            color: transparent;  /* Start with transparent text */
+            color: transparent;
             transition: color 0.3s ease;
         }
 
         .notice-box:hover strong {
-            color: #fff;  /* Show color on hover */
+            color: #fff;
         }
         .switch {
             position: relative;
@@ -511,6 +533,9 @@
             background: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(5px);
         }
+        .container.wide .table-container {
+            backdrop-filter: none;
+        }
         table {
             width: 100%;
             border-collapse: separate;
@@ -671,6 +696,164 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
+        .visualization-container {
+            padding: 20px 0;
+        }
+
+        .drop-zone {
+            border: 2px dashed rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+            margin-bottom: 20px;
+        }
+
+        .drop-zone.drag-over {
+            border-color: black;
+            background: rgba(255, 255, 255, 0.95);
+            transform: scale(1.02);
+        }
+
+        .drop-zone-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            color: #666;
+        }
+
+        .drop-zone-content svg {
+            color: #999;
+            transition: all 0.3s ease;
+        }
+
+        .drop-zone:hover .drop-zone-content svg {
+            color: black;
+            transform: translateY(-4px);
+        }
+
+        .drop-text {
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .visualization-area {
+            margin-top: 20px;
+            min-height: 500px;
+        }
+        .page-count-group {
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .slider-container {
+            position: relative;
+            padding: 15px 0;
+            margin-top: 10px;
+        }
+
+        .page-slider {
+            width: 100%;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #e5e7eb;
+            outline: none;
+            border-radius: 3px;
+            margin: 10px 0;
+        }
+
+        .page-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: black;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .page-slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            background: black;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .page-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+        }
+
+        .page-slider::-moz-range-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+        }
+
+        .slider-value {
+            position: absolute;
+            top: -5px;
+            left: 0;
+            transform: translateX(-50%);
+            background: black;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .slider-value.active {
+            opacity: 1;
+        }
+
+        .usage-indicator {
+            margin-top: 16px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .usage-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: #f3f4f6;
+            border-radius: 16px;
+            font-size: 13px;
+            color: #6b7280;
+            transition: all 0.3s ease;
+        }
+
+        .usage-pill.warning {
+            background: #fff7ed;
+            color: #9a3412;
+        }
+
+        .usage-pill.danger {
+            background: #fef2f2;
+            color: #991b1b;
+        }
+
+        .page-text {
+            transition: all 0.3s ease;
+        }
         @keyframes float {
             0%, 100% {
                 transform: translateY(0px) rotate(-2deg);
@@ -762,10 +945,10 @@
 
             <p><strong>Examples of incompatible websites:</strong></p>
             <ul>
-                <li>Some e-commerce sites like Amazon</li>
+                <li>Some e-commerce sites</li>
                 <li>Some social media platforms</li>
                 <li>Online banking and payment gateways</li>
-                <li>Websites with restricted content access or captcha verification</li>
+                <li>Websites with restricted content access or advanced captcha verification</li>
             </ul>
 
             <br>
@@ -828,6 +1011,7 @@
                 <div class="tabs">
                     <button type="button" class="tab {% if not show_results %}active{% endif %}" data-tab="input">Input</button>
                     <button type="button" class="tab {% if show_results %}active{% endif %}" data-tab="result">Result</button>
+                    <button type="button" class="tab" data-tab="visualize">Visualize</button>
                     <div class="tab-slider"></div>
                 </div>
 
@@ -842,6 +1026,26 @@
                         <label class="input-label" for="fields">Fields (separated by commas)</label>
                         <input type="text" class="input-field" name="fields" id="fields"
                                placeholder="e.g., title, price, description" required>
+                    </div>
+
+                    <div class="input-group page-count-group">
+                        <label class="input-label" for="page_count">Number of Pages to Scrape</label>
+                        <div class="slider-container">
+                            <input type="range" class="page-slider" name="page_count" id="page_count"
+                                   min="1" max="5" value="1" step="1">
+                            <div class="slider-value">
+                                <span id="pageCountValue">1</span>
+                                <span class="page-text">page</span>
+                            </div>
+                            <div class="usage-indicator">
+                                <div class="usage-pill">
+                                    <svg class="usage-icon" viewBox="0 0 24 24" width="14" height="14">
+                                        <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                                    </svg>
+                                    <span id="usageCost">Uses 1 trial credit</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <button type="submit" class="submit-btn" id="submitBtn">Scrape</button>
@@ -894,6 +1098,24 @@
                         </div>
                     {% endif %}
                 </div>
+
+                <div id="visualize-tab" class="tab-content">
+                    <div class="visualization-container">
+                        <div class="drop-zone" id="dropZone">
+                            <div class="drop-zone-content">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="17 8 12 3 7 8"/>
+                                    <line x1="12" y1="3" x2="12" y2="15"/>
+                                </svg>
+                                <p class="drop-text">Drag & drop your CSV, XLSX or JSON file here<br>or click to browse</p>
+                                <input type="file" id="fileInput" accept=".csv,.json" class="file-input" />
+                            </div>
+                        </div>
+                        <div id="visualizationArea" class="visualization-area"></div>
+                    </div>
+                </div>
+
             </div>
         </form>
     </div>
@@ -903,6 +1125,171 @@
     </div>
 
     <script>
+        const pageSlider = document.getElementById('page_count');
+        const pageCountValue = document.getElementById('pageCountValue');
+        const pageText = document.querySelector('.page-text');
+        const usageCost = document.getElementById('usageCost');
+        const usagePill = document.querySelector('.usage-pill');
+
+        if (pageSlider && pageCountValue && usageCost) {
+            const updateSliderValue = () => {
+                const value = pageSlider.value;
+                const percent = ((value - pageSlider.min) / (pageSlider.max - pageSlider.min)) * 100;
+                pageCountValue.textContent = value;
+                pageText.textContent = value > 1 ? 'pages' : 'page';
+
+                // Update slider thumb position
+                pageCountValue.parentElement.style.left = `${percent}%`;
+                pageCountValue.parentElement.classList.add('active');
+
+                // Calculate and display usage cost
+                let usageText = 'Uses 1 trial credit';
+                usagePill.className = 'usage-pill';
+
+                if (value >= 5) {
+                    usageText = 'Uses 3 trial credits';
+                    usagePill.classList.add('danger');
+                } else if (value > 3) {
+                    usageText = 'Uses 2 trial credits';
+                    usagePill.classList.add('warning');
+                }
+
+                usageCost.textContent = usageText;
+
+                // Update slider background
+                pageSlider.style.background = `linear-gradient(to right, black ${percent}%, #e5e7eb ${percent}%)`;
+            };
+
+            pageSlider.addEventListener('input', updateSliderValue);
+            pageSlider.addEventListener('change', updateSliderValue);
+
+            // Initial update
+            updateSliderValue();
+
+            // Hide the value tooltip when not interacting
+            pageSlider.addEventListener('mouseup', () => {
+                setTimeout(() => {
+                    pageCountValue.parentElement.classList.remove('active');
+                }, 1000);
+            });
+
+            pageSlider.addEventListener('mouseover', () => {
+                pageCountValue.parentElement.classList.add('active');
+            });
+
+            pageSlider.addEventListener('mouseout', () => {
+                if (!pageSlider.matches(':active')) {
+                    pageCountValue.parentElement.classList.remove('active');
+                }
+            });
+        }
+
+        function initializeVisualization() {
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('fileInput');
+            const visualizationArea = document.getElementById('visualizationArea');
+            let isDialogOpen = false;  // Track if file dialog is open
+
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, unhighlight, false);
+            });
+
+            function highlight(e) {
+                dropZone.classList.add('drag-over');
+            }
+
+            function unhighlight(e) {
+                dropZone.classList.remove('drag-over');
+            }
+
+            dropZone.addEventListener('drop', handleDrop, false);
+
+            // Modified click handler with dialog tracking
+            dropZone.addEventListener('click', () => {
+                if (!isDialogOpen) {
+                    isDialogOpen = true;
+                    fileInput.click();
+                }
+            });
+
+            // Track when the file dialog is closed
+            window.addEventListener('focus', () => {
+                setTimeout(() => {
+                    isDialogOpen = false;
+                }, 300);
+            }, true);
+
+            fileInput.addEventListener('change', handleFileSelect);
+
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const file = dt.files[0];
+                if (file) {
+                    handleFile(file);
+                }
+            }
+
+            function handleFileSelect(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    handleFile(file);
+                }
+            }
+
+            function handleFile(file) {
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+
+                // Show loading state
+                visualizationArea.innerHTML = '<div class="loading-spinner"></div>';
+
+                fetch('/upload/', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        visualizationArea.innerHTML = data.html;
+                    } else {
+                        throw new Error(data.message);
+                    }
+                })
+                .catch(error => {
+                    visualizationArea.innerHTML = `
+                        <div class="error-banner">
+                            <div class="error-content">
+                                <div class="error-title">Error</div>
+                                <div class="error-message">${error.message}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                // Reset the file input to allow selecting the same file again
+                fileInput.value = '';
+            }
+        }
+
+        // Initialize visualization when switching to the tab
+        document.querySelector('.tab[data-tab="visualize"]').addEventListener('click', () => {
+            setTimeout(initializeVisualization, 100);
+        });
+
         function initializeApiTabs() {
             const apiTabs = document.querySelectorAll('.api-tab');
             const apiSlider = document.querySelector('.api-tab-slider');
@@ -1399,14 +1786,29 @@
             const isCustomApi = document.querySelector('.api-tab[data-api="custom"]').classList.contains('active');
             if (!isCustomApi) {
                 const usageCount = parseInt(localStorage.getItem('apiUsageCount') || '0');
-                if (usageCount >= 5) { // This number sets up the limit to the default API usage
+                const pageCount = parseInt(document.getElementById('page_count').value) || 1;
+
+                // Calculate usage cost based on page count
+                let usageCost = 1;
+                if (pageCount >= 5) usageCost = 3;
+                else if (pageCount > 3) usageCost = 2;
+
+                if (usageCount >= 5) {
                     document.getElementById('trialEndedPopup').style.display = 'flex';
                     return false;
                 }
-                localStorage.setItem('apiUsageCount', (usageCount + 1).toString());
+
+                // Check if we have enough uses left
+                if (usageCount + usageCost > 5) {
+                    showError('Trial Usage Limit', `Scraping ${pageCount} pages requires ${usageCost} trial uses. You only have ${5 - usageCount} uses remaining.`);
+                    return false;
+                }
+
+                localStorage.setItem('apiUsageCount', (usageCount + usageCost).toString());
             }
             return true;
         }
+
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', initializeApiUsage);

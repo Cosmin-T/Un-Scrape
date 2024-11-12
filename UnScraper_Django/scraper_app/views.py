@@ -20,6 +20,7 @@ from django.http import HttpResponse
 import csv
 from dotenv import load_dotenv, dotenv_values
 import os
+from .powerbi import Pwbi
 
 dotenv_path = os.path.join(os.path.dirname(__file__), '..', '.env')
 # print(f'Dotenv path is: {dotenv_path}')
@@ -52,7 +53,7 @@ def groq_connection(api_key: str) -> Groq:
         logger.error(f"Error creating Groq client: {e}")
         raise ScraperError(f"Failed to initialize Groq API: {str(e)}")
 
-async def fetch_and_clean_html(url: str) -> str:
+async def fetch_and_clean_html(url: str, page_count: int = 1) -> str:
     """Fetch and clean HTML content using Playwright"""
     try:
         async with async_playwright() as playwright:
@@ -74,41 +75,139 @@ async def fetch_and_clean_html(url: str) -> str:
             await page.route("**/*tracking*.js", lambda route: route.abort())
             await page.route("**/*advertisement*.js", lambda route: route.abort())
 
-            logger.info(f"Navigating to {url}")
-            await page.goto(url, wait_until='domcontentloaded')
+            all_content = []
+            current_page = 1
 
-            # Scroll to trigger lazy loading
-            for _ in range(30):
-                await page.mouse.wheel(0, 2000)
-                await page.wait_for_timeout(150)
+            while current_page <= page_count:
+                logger.info(f"Navigating to page {current_page} of {url}")
 
-            try:
-                await page.wait_for_load_state('networkidle', timeout=10000)
-            except Exception:
-                pass
+                if current_page == 1:
+                    await page.goto(url, wait_until='domcontentloaded')
 
-            html_content = await page.content()
+                # Scroll to trigger lazy loading
+                for _ in range(30):
+                    await page.mouse.wheel(0, 2000)
+                    await page.wait_for_timeout(150)
 
-            # Clean HTML
-            soup = BeautifulSoup(html_content, 'html.parser')
-            for element in soup.find_all(['script', 'style', 'nav', 'header', 'footer', 'aside', 'iframe']):
-                element.decompose()
+                try:
+                    await page.wait_for_load_state('networkidle', timeout=10000)
+                except Exception:
+                    pass
 
-            # Convert to markdown/text
-            markdown_converter = html2text.HTML2Text()
-            markdown_converter.ignore_links = False
-            markdown_converter.ignore_images = True
-            markdown_converter.ignore_emphasis = False
-            markdown_converter.ignore_tables = False
-            markdown_converter.body_width = 0
+                html_content = await page.content()
 
-            text_content = markdown_converter.handle(str(soup))
+                # Clean HTML
+                soup = BeautifulSoup(html_content, 'html.parser')
+                for element in soup.find_all(['script', 'style', 'nav', 'header', 'footer', 'aside', 'iframe']):
+                    element.decompose()
 
-            # Clean content
+                # Convert to markdown/text
+                markdown_converter = html2text.HTML2Text()
+                markdown_converter.ignore_links = False
+                markdown_converter.ignore_images = True
+                markdown_converter.ignore_emphasis = False
+                markdown_converter.ignore_tables = False
+                markdown_converter.body_width = 0
+
+                text_content = markdown_converter.handle(str(soup))
+                all_content.append(text_content)
+
+                if current_page < page_count:
+                    # Comprehensive list of next button selectors
+                    next_button_selectors = [
+                        'button[aria-label*="next" i]',
+                        'button:has-text("Next")',
+                        'button:has-text("next")',
+                        'a[rel="next"]',
+                        'a[aria-label*="next" i]',
+                        'a:has-text("Next")',
+                        'a:has-text("next")',
+                        'a[class*="next"]',
+                        'a.next',
+                        '.next a',
+                        '[class*="pagination"] [class*="next"]',
+                        '[class*="pager"] [class*="next"]',
+                        '[class*="paginate"] [class*="next"]',
+                        'li.next a',
+                        '.pagination-next',
+                        '[aria-label="Next page"]',
+                        '[aria-label="next page"]',
+                        'input[value="Next"]',
+                        'input[value="next"]',
+                        'span[class*="next"]',
+                        'div[class*="next"]'
+                    ]
+
+                    # Try each selector
+                    next_button = None
+                    for selector in next_button_selectors:
+                        try:
+                            next_button = await page.wait_for_selector(selector, timeout=1000)
+                            if next_button:
+                                logger.info(f"Found next button with selector: {selector}")
+                                break
+                        except Exception:
+                            continue
+
+                    if not next_button:
+                        # Try finding by text content if no button found
+                        try:
+                            next_button = await page.get_by_text(re.compile(r'next', re.IGNORECASE), exact=False).first
+                            if next_button:
+                                logger.info("Found next button by text content")
+                        except Exception:
+                            pass
+
+                    if not next_button:
+                        logger.info("No next button found, stopping pagination")
+                        break
+
+                    try:
+                        # Try multiple click methods
+                        try:
+                            # First try native click
+                            await next_button.click()
+                            logger.info("Clicked next button using native click")
+                        except Exception:
+                            try:
+                                # Try JavaScript click
+                                await page.evaluate('(element) => element.click()', next_button)
+                                logger.info("Clicked next button using JavaScript")
+                            except Exception:
+                                # Try getting href and navigating
+                                href = await next_button.get_attribute('href')
+                                if href:
+                                    if not href.startswith('http'):
+                                        # Handle relative URLs
+                                        base_url = '/'.join(url.split('/')[:3])
+                                        href = f"{base_url.rstrip('/')}/{href.lstrip('/')}"
+                                    await page.goto(href)
+                                    logger.info(f"Navigated to next page using href: {href}")
+                                else:
+                                    raise Exception("No href attribute found")
+
+                        # Wait for navigation to complete
+                        await page.wait_for_timeout(2000)
+
+                        # Verify navigation succeeded by checking URL or content change
+                        new_url = page.url
+                        if new_url == url and current_page > 1:
+                            logger.warning("URL didn't change after clicking next button")
+                            break
+                        url = new_url
+
+                    except Exception as e:
+                        logger.error(f"Error navigating to next page: {e}")
+                        break
+
+                current_page += 1
+
+            # Clean combined content
+            combined_content = "\n".join(all_content)
             space_pattern = re.compile(r'\s+')
             url_pattern = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
 
-            cleaned_content = space_pattern.sub(' ', text_content)
+            cleaned_content = space_pattern.sub(' ', combined_content)
             cleaned_content = url_pattern.sub('', cleaned_content)
 
             return cleaned_content.strip()
@@ -210,15 +309,85 @@ def process_chunk(client: Groq, sys_message: str, chunk: str, fields: List[str])
     # Return empty list if all retries fail
     return []
 
+def handle_file_upload(request):
+    """Handle file upload for visualization"""
+    try:
+        if 'file' not in request.FILES:
+            raise ValueError("No file uploaded")
+
+        uploaded_file = request.FILES['file']
+        pwbi = Pwbi()
+        df = pwbi.process_file(uploaded_file)
+        pwbi.items = df.to_dict('records')
+        visualization_html = pwbi.dashboard()
+
+        return JsonResponse({
+            'status': 'success',
+            'html': visualization_html
+        })
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=400)
+
+def parse_price_fields(data):
+    """Parse and convert price fields in the data"""
+    rows = data.get('rows', [])
+    if not rows:
+        return data
+
+    # Find price fields in the data
+    price_fields = [field for field in rows[0].keys() if 'price' in field.lower()]
+
+    # Compile a regex to match all known currencies
+    currency_regex = re.compile(r'(\$|€|£|¥|₹|₽|₺|₩|₪|₫|฿|₦|₴|؋|Ar|R|Br|лв|៛|₡|₲|₵|Kč|kr|£|Q|Ft|Rp|﷼|J\$|₭|ден|₮|MT|₦|C\$|P|S/|₨|₱|zł|lei|руб|RSD|₸|₭|DB|Bs|TSh|₸|₾|USD|EUR|GBP|JPY|AUD|CAD|CNY|INR|RUB|TRY|KRW|ILS|VND|THB|NGN|BRL|ZAR|HKD|SGD|MYR|MXN|PHP|PLN|IDR|SAR|EGP|CHF|NOK|SEK|NZD|DKK|AED|KWD|ARS|COP|PEN|CLP|UAH|GHS|AOA|BHD|BWP|GIP|LKR|MVR|MUR|NAD|PGK|TOP|UYU|WST|YER|AFN|ALL|DZD|AOA|XCD|AMD|AWG|AZN|BSD|BHD|BDT|BBD|BYN|BZD|BMD|BOB|BAM|BWP|BND|BGN|BIF|CVE|KHR|XAF|XPF|KYD|KMF|XAF|CLF|KPW|CRC|CUP|DOP|DJF|XCD|ERN|SZL|ETB|FJD|GMD|XAU|XAG|XPT|XPD|GYD|HTG|HUF|IRR|IQD|ISK|JOD|KZT|KGS|LAK|LBP|LSL|LRD|LYD|MGA|MKD|MMK|MNT|MAD|MZN|NIO|OMR|PKR|PYG|QAR|RON|RWF|STD|SCR|SLL|SBD|SOS|SSP|SDG|SRD|SYP|TJS|TMT|TND|UGX|UZS|VEF|VUV|XOF|ZMW|ZWL)', re.IGNORECASE)
+
+    # Parse and convert price fields
+    for row in rows:
+        for field in price_fields:
+            price_value = row[field]
+
+            # Check if a currency is present
+            match = currency_regex.search(price_value)
+            if match:
+                currency_symbol = match.group()
+            else:
+                currency_symbol = 'Unknown'
+
+            # Remove non-numeric characters except for commas and periods
+            cleaned_price = re.sub(r'[^0-9,\.]', '', price_value)
+
+            # Replace comma (European decimal) with period
+            cleaned_price = cleaned_price.replace(',', '.')
+
+            # Remove thousands separator (period)
+            cleaned_price = cleaned_price.replace('.', '', cleaned_price.count('.') - 1)
+
+            # Convert cleaned price to float
+            try:
+                new_price = float(cleaned_price)
+            except ValueError:
+                new_price = price_value  # Fallback to the original value if it fails
+
+            # Remove the original price field and replace it with a new one
+            row.pop(field)
+            row[f'Price ({currency_symbol})'] = new_price
+
+    return data
+
+
 @csrf_protect
 @never_cache
 async def scrape_website(request):
     """Main view function for website scraping"""
+
+    # Initialize context dictionary for template rendering:
     context = {
-        'rows': None,
-        'error': None,
-        'show_results': False,
-        'default_api_key': GROQ_API_KEY
+        'rows': None, # Holds the scraped data (None until data is processed)
+        'error': None, # Stores error messages (None if no errors)
+        'show_results': False, # Boolean flag to control results display in template
+        'default_api_key': GROQ_API_KEY # Default Groq API key from environment variables
     }
 
     if request.method == 'POST':
@@ -227,6 +396,7 @@ async def scrape_website(request):
             url = request.POST.get('url')
             groq_api_key = request.POST.get('groq_api_key')
             fields = [field.strip() for field in request.POST.get('fields', '').split(',') if field.strip()]
+            page_count = int(request.POST.get('page_count', 1))
 
             # Validate URL
             url_validator = URLValidator()
@@ -239,11 +409,15 @@ async def scrape_website(request):
             if not fields:
                 raise ScraperError("Please specify at least one field to extract")
 
+            # Validate page count
+            if page_count < 1 or page_count > 10:
+                raise ScraperError("Page count must be between 1 and 10")
+
             # Initialize Groq client
             client = groq_connection(groq_api_key)
 
-            # Fetch and process content
-            content = await fetch_and_clean_html(url)
+            # Fetch and process content with pagination
+            content = await fetch_and_clean_html(url, page_count)
             chunk_size = 10000
             chunks = [content[i:i+chunk_size] for i in range(0, len(content), chunk_size)]
 
@@ -275,7 +449,7 @@ async def scrape_website(request):
                 raise ScraperError("Could not extract any data with the specified fields")
 
             context.update({
-                'rows': all_listings,
+                'rows': parse_price_fields({'rows': all_listings})['rows'],
                 'show_results': True
             })
 
@@ -297,7 +471,7 @@ def download_csv(request):
     if request.method == 'POST':
         try:
             # Parse the JSON data from the request body
-            data = json.loads(request.body)
+            data = parse_price_fields(json.loads(request.body))
             rows = data.get('rows', [])
 
             # Set up the HTTP response for CSV download
@@ -326,7 +500,7 @@ def download_json(request):
     if request.method == 'POST':
         try:
             # Parse the JSON data from the request body
-            data = json.loads(request.body)
+            data = parse_price_fields(json.loads(request.body))
             rows = data.get('rows', [])
 
             # Set up the HTTP response for JSON download
