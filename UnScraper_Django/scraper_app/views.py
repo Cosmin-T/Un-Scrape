@@ -255,6 +255,7 @@ def process_chunk(client: Groq, sys_message: str, chunk: str, fields: List[str])
     # Initialize model index and retry counter
     current_model_index = 0
     retry_count = 0
+    error_details = None
 
     # Retry loop with a maximum of 3 attempts
     while retry_count < 3:
@@ -289,24 +290,61 @@ def process_chunk(client: Groq, sys_message: str, chunk: str, fields: List[str])
                     raise ValueError("Missing 'listings' key")
                 return parsed_chunk['listings']
             except (json.JSONDecodeError, ValueError) as e:
-                # Fallback parsing if JSON is invalid
                 logger.error(f"Error parsing response: {e}")
-                listings = re.findall(r'\{[^{}]*\}', completion)
-                if listings:
-                    return [json.loads(clean_json_string(listing)) for listing in listings]
                 retry_count += 1
+                error_details = {
+                    'error_type': 'parsing_error',
+                    'message': str(e)
+                }
                 continue
 
         except Exception as e:
-            # Handle errors, including rate limiting
+            error_message = str(e).lower()
             logger.error(f"Error in process_chunk: {e}")
-            if "rate_limit" in str(e).lower():
+
+            # Handle different types of Groq API errors
+            if "rate_limit" in error_message or "429" in error_message:
+                error_details = {
+                    'error_type': 'rate_limit',
+                    'message': 'Rate limit exceeded. Please try again later or switch to a custom API key.'
+                }
                 current_model_index = (current_model_index + 1) % len(llms)
                 logger.info(f"Rate limit hit, switching to model {llms[current_model_index]}")
+            elif "invalid_api_key" in error_message or "authentication" in error_message:
+                error_details = {
+                    'error_type': 'invalid_api_key',
+                    'message': 'Invalid API key. Please check your API key and try again.'
+                }
+                break  # Don't retry for invalid API key
+            elif "insufficient_quota" in error_message:
+                error_details = {
+                    'error_type': 'quota_exceeded',
+                    'message': 'API quota exceeded. Please check your subscription or switch to a different API key.'
+                }
+                break  # Don't retry for quota issues
             else:
+                error_details = {
+                    'error_type': 'general_error',
+                    'message': f'An error occurred: {str(e)}'
+                }
                 retry_count += 1
 
-    # Return empty list if all retries fail
+    # If we exit the retry loop without success, raise an exception with error details
+    if error_details:
+        error_message = json.loads(str(e))
+        error_type = error_message.get('error', {}).get('type', '')
+        message = error_message.get('error', {}).get('message', '')
+
+        if '429' in str(e) or 'rate_limit' in str(e).lower():
+            # Extract wait time if available
+            wait_time = re.search(r'try again in (.+?)\.', message)
+            wait_msg = f" Please wait {wait_time.group(1)}" if wait_time else ""
+            raise ScraperError(f"Rate limit reached.{wait_msg} The API is processing too many requests.")
+        elif '503' in str(e):
+            raise ScraperError("Groq API is temporarily unavailable. Please try again in a few minutes.")
+        else:
+            raise ScraperError(f"API Error: {message}")
+
     return []
 
 def handle_file_upload(request):
@@ -437,7 +475,11 @@ async def scrape_website(request):
                     loop.run_in_executor(pool, process_chunk, client, sys_message, chunk, fields)
                     for chunk in chunks
                 ]
-                results = await asyncio.gather(*tasks)
+                try:
+                    results = await asyncio.gather(*tasks)
+                except ScraperError as e:
+                    error_details = json.loads(str(e))
+                    raise ScraperError(error_details['message'])
 
             # Combine results
             all_listings = []
@@ -454,7 +496,14 @@ async def scrape_website(request):
             })
 
         except ScraperError as e:
-            context['error'] = str(e)
+            # Make the error message more user-friendly
+            error_msg = str(e)
+            if "Rate limit reached" in error_msg:
+                context['error'] = error_msg
+            elif "Service Unavailable" in error_msg:
+                context['error'] = "Groq API servers are currently overwhelmed. Please try again later."
+            else:
+                context['error'] = error_msg
             logger.error(f"Scraping error: {e}")
         except Exception as e:
             context['error'] = f"An unexpected error occurred: {str(e)}"
